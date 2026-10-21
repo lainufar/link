@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>siMutu – Portal Produktivitas</title>
+
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
+
+  <!-- Font Awesome (ikon) -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-pb3xJ6+lUh1Hv7I6F/0Bp/wBQq03SJic4Z9NhZgV6e1azGJ9YcVZTH3etkYhT5QxR6x65eoFhd6Ijv+7ztJp4g=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col items-center p-4 transition-colors">
+
+  <!-- Avatar + Nama -->
+  <div class="flex flex-col items-center mb-8">
+    <img
+      src="https://ui-avatars.com/api/?name=siMutu&background=0D8ABC&color=fff&size=128"
+      alt="Avatar siMutu"
+      class="w-32 h-32 rounded-full object-cover mb-4 shadow-lg"
+    />
+    <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">siMutu</h1>
+    <p class="text-gray-600 dark:text-gray-400 text-center max-w-xs mt-2">
+      Portal satu pintu untuk aplikasi‑aplikasi produktivitas internal.
+    </p>
+  </div>
+
+  <!-- Daftar aplikasi (tombol) -->
+  <main id="apps" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 w-full max-w-4xl mb-12"></main>
+
+  <script src="script.js"></script>
+</body>
+</html>
