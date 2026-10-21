@@ -1,81 +1,88 @@
-// script.js – mengambil data dari Google Apps Script, menampilkan tombol, menghitung klik
-
-// Ganti bagian ini dengan URL Web‑App yang Anda dapatkan setelah men‑deploy Apps Script
-const API_URL = "https://script.google.com/macros/s/AKfycbyx2BHCypDVUQDtjzZ2xwdTEP0Q6ui8tURAyI-SrWdwsquGUVB7_kQEsP5OZxtJE6jM/exec"; // ← ubah
-
-/** Memuat daftar aplikasi dari Sheet lewat API */
-async function loadApps() {
-  try {
-    const res = await fetch(API_URL);
-    const json = await res.json();
-    renderButtons(json.apps);
-  } catch (e) {
-    console.error('Gagal ambil data:', e);
-    document.getElementById('apps').innerHTML =
-      '<p class="text-red-500">Tidak dapat memuat aplikasi.</p>';
+const layanan = [
+  {
+    nama: "Pengajuan Persediaan",
+    deskripsi: "Ajukan permintaan barang persediaan dan material kantor",
+    ikon: "📦",
+    url: "persediaan.html"
+  },
+  {
+    nama: "Pengajuan Pemakaian Bahan Lab",
+    deskripsi: "Ajukan pemakaian bahan laboratorium untuk kegiatan kantor",
+    ikon: "🧪",
+    url: "bahan-lab.html"
+  },
+  {
+    nama: "Permohonan Belanja",
+    deskripsi: "Ajukan permohonan pembelian barang atau jasa kantor",
+    ikon: "🛒",
+    url: "belanja.html"
   }
-}
+];
 
-/** Membuat kartu tombol untuk tiap aplikasi */
-function renderButtons(apps) {
-  const container = document.getElementById('apps');
-  container.innerHTML = '';
-  apps.forEach(app => {
-    const btn = document.createElement('a');
-    // kelas Tailwind untuk tampilan kartu
-    btn.className =
-      'block p-4 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-colors text-center';
-    btn.title = app.Nama;
+const container = document.getElementById('card-container');
 
-    // jika ada password, gunakan button + modal (saat ini belum ada modal – hanya contoh)
-    if (app.Password && app.Password.trim() !== '') {
-      btn.href = '#';
-      btn.onclick = e => {
-        e.preventDefault();
-        const pwd = prompt('Masukkan password untuk ' + app.Nama + ':');
-        if (pwd === null) return; // batal
-        verifyPassword(app.ID, pwd);
-      };
-    } else {
-      btn.href = app.URL;
-      btn.target = '_blank';
-    }
+layanan.forEach((l) => {
+  const a = document.createElement('a');
+  a.href = l.url;
+  a.className = 'card';
+  a.target = '_self';
 
-    btn.innerHTML = `
-      <strong class="block text-lg text-gray-800 dark:text-gray-100 mb-1">${app.Nama}</strong>
-      <span class="text-sm text-gray-500 dark:text-gray-400">${app.Kategori}</span>
-    `;
+  const divHeader = document.createElement('div');
+  divHeader.className = 'card-header';
 
-    // catat klik (fire‑and‑forget)
-    btn.addEventListener('click', () => {
-      fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'click', id: app.ID })
-      }).catch(console.error);
-    });
+  const divIkon = document.createElement('div');
+  divIkon.className = 'ikon';
+  divIkon.textContent = l.ikon;
+  divHeader.appendChild(divIkon);
 
-    container.appendChild(btn);
-  });
-}
+  const h3 = document.createElement('h3');
+  h3.textContent = l.nama;
 
-/** Verifikasi password (jika ada) */
-async function verifyPassword(appId, pwd) {
+  const p = document.createElement('p');
+  p.textContent = l.deskripsi;
+
+  a.appendChild(divHeader);
+  a.appendChild(h3);
+  a.appendChild(p);
+  container.appendChild(a);
+});
+
+// Salin tautan halaman
+document.getElementById('btn-salin').addEventListener('click', async () => {
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'verify', appId, password: pwd })
-    });
-    const data = await res.json();
-    if (data.success) {
-      window.open(data.url, '_blank');
-    } else {
-      alert(data.message || 'Password salah');
-    }
-  } catch (e) {
-    console.error(e);
-    alert('Terjadi kesalahan saat memverifikasi.');
+    await navigator.clipboard.writeText(window.location.href);
+    tampilkanToast('Tautan halaman berhasil disalin!');
+  } catch (err) {
+    const tmp = document.createElement('input');
+    tmp.value = window.location.href;
+    document.body.appendChild(tmp);
+    tmp.select();
+    document.execCommand('copy');
+    document.body.removeChild(tmp);
+    tampilkanToast('Tautan halaman berhasil disalin!');
   }
-}
+});
 
-// Jalankan saat halaman siap
-document.addEventListener('DOMContentLoaded', loadApps);
+// Bagikan profil
+document.getElementById('btn-bagikan').addEventListener('click', async () => {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: document.title,
+        text: 'Buka portal kantor',
+        url: window.location.href
+      });
+      return;
+    } catch (err) {}
+  }
+  tampilkanToast('Salin tautan secara manual: ' + window.location.href);
+});
+
+function tampilkanToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2500);
+}
